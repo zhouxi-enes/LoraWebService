@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title id="lang_title">ENeS Lora Safety Confirmation System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+
+<div class="jumbotron text-center">
+    <h2 id="lang_header">ENeS Lora Safety Confirmation System</h2>
+    <p id="lang_instruction">Please fill out the form to let the command center know your safety</p>
+</div>
+
+<div class="container">
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            <h5 id="lang_name">Your name:</h5>
+            <input type="text" style="width:100%" class="form-control" id="name">
+            <p id="name_check_txt" style="color: red"></p>
+        </li>
+
+        <li class="list-group-item">
+            <h5 style="color: red" id="lang_optional">Optional</h5>
+            <h5 id="lang_idnumber">Government issued identification number:</h5>
+            <input type="text" style="width:100%" class="form-control" id="id_number">
+        </li>
+
+        <li class="list-group-item">
+            <h5 id="lang_detail">Details:</h5>
+            <textarea class="form-control" style="width:100%" maxlength="200" rows="5" id="comment"></textarea>
+            <p id="detail_check_txt" style="color: red"></p>
+        </li>
+
+    </ul>
+    <p></p>
+    <div style="text-align: right">
+        <button type="button" class="btn btn-warning" id="clear">Clear</button>
+        <button type="button" class="btn btn-primary" id="send">Submit</button>
+    </div>
+    <p></p>
+    <p></p>
+</div>
+
+<div class="modal fade" id="myModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Alert</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+<div id="cover" style="display:none">
+    <div class="profile-main-loader">
+        <div class="loader">
+            <svg class="circular-loader" viewBox="25 25 50 50">
+                <circle class="loader-path" cx="50" cy="50" r="20" fill="none" stroke="#20c997" stroke-width="3"/>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<script src="./js/jquery-3.4.1.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    var language_data;
+
+    function readTextFile(file, callback) {
+        var rawFile = new XMLHttpRequest();
+        rawFile.overrideMimeType("application/json");
+        rawFile.open("GET", file, true);
+        rawFile.onreadystatechange = function () {
+            if (rawFile.readyState === 4 && rawFile.status == "200") {
+                callback(rawFile.responseText);
+            }
+        };
+        rawFile.send(null);
+    }
+
+    //
+    function changeLanguage(data) {
+        $("#lang_title").html(data["lang_title"]);
+        $("#lang_header").html(data["lang_header"]);
+        $("#lang_instruction").html(data["lang_instruction"]);
+        $("#lang_name").html(data["lang_name"]);
+        $("#lang_optional").html(data["lang_optional"]);
+        $("#lang_idnumber").html(data["lang_idnumber"]);
+        $("#lang_detail").html(data["lang_detail"]);
+        $("#clear").html(data["clear"]);
+        $("#send").html(data["send"]);
+    }
+
+    //
+    function check_is_filled() {
+        var name_ = $("#name").val();
+        var is_name_ok = false;
+        if (name_.length === 0) {
+            var txt1 = "Please input your name";
+            if (language_data != null) {
+                txt1 = language_data["lang_notinputname"];
+            }
+            $("#name_check_txt").html(txt1);
+        } else {
+            is_name_ok = true;
+        }
+        var detail_ = $("#comment").val();
+        var is_details_ok = false;
+        if (detail_.length === 0) {
+            var txt2 = "Please input details";
+            if (language_data != null) {
+                txt2 = language_data["lang_notinputdetail"];
+            }
+            $("#detail_check_txt").html(txt2);
+        } else {
+            is_details_ok = true;
+        }
+
+        if (is_name_ok && is_details_ok) {
+            return true;
+        }
+        return false;
+    }
+
+    // change language
+    var now_system_language = navigator.language;
+    try {
+        var tmp0;
+        if ((tmp0 = now_system_language.indexOf("-")) !== -1) {
+            now_system_language = now_system_language.substring(0, tmp0);
+        }
+    } catch (e) {
+        console.log(e);
+    }
+
+    //read file
+    var lang_language_file_path = "./lang/" + now_system_language + ".json";
+    readTextFile(lang_language_file_path, function (text) {
+        var data = JSON.parse(text);
+        language_data = data;
+        // change language
+        changeLanguage(data);
+    });
+
+    function clear() {
+        $("#name").val("");
+        $("#id_number").val("");
+        $("#comment").val("");
+        $("#name_check_txt").html("");
+        $("#detail_check_txt").html("")
+    }
+
+    //set button action
+    $("#clear").click(
+        clear()
+    );
+
+    //set click
+    $("#send").click(
+        function () {
+            if (!check_is_filled()) {
+                return;
+            }
+            $("#cover").show();
+
+            var final_name = $("#name").val();
+            var final_id_number = $("#id_number").val();
+            var final_comment = $("#comment").val();
+            var final_json = {
+                "n": final_name,
+                "i": final_id_number,
+                "c": final_comment
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "s",
+                data: final_json,
+                success: function (data) {
+                    $("#cover").hide();
+                    if (data.result === 0){
+                        var msg_sent_success = "Message Sent";
+                        if(language_data != null) {
+                            msg_sent_success = language_data["lang_sent"];
+                        }
+                        $('.modal-body').html(msg_sent_success);
+                        $('#myModal').modal('show');
+                        clear();
+                    } else {
+                        var failed = "failed";
+                        if(language_data != null) {
+                            failed = language_data["lang_sent_failed"];
+                        }
+                        $('.modal-body').html(failed);
+                        $('#myModal').modal('show');
+                    }
+                },
+                error: function () {
+                    $("#cover").hide();
+
+                }
+            })
+        }
+    );
+
+</script>
+
+</body>
+
+</html>

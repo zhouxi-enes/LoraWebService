@@ -1,0 +1,15 @@
+{
+  "lang_title": "ENeS Lora 安全確認システム",
+  "lang_header": "ENeS Lora 安全確認システム",
+  "lang_instruction": "安否確認を行うために、フォームを記入してください。",
+  "lang_name": "お名前：",
+  "lang_optional": "オプション",
+  "lang_idnumber": "政府発行の身分証明書番号：",
+  "lang_detail": "詳細：",
+  "clear": "クリア",
+  "send": "提出する",
+  "lang_notinputname": "お名前を入力してください",
+  "lang_notinputdetail": "詳細を入力してください",
+  "lang_sent": "送信成功",
+  "lang_sent_failed": "送信失敗"
+}

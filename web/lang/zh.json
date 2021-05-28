@@ -1,0 +1,15 @@
+{
+  "lang_title": "ENeS Lora 安全確認系統",
+  "lang_header": "ENeS Lora 安全確認系統",
+  "lang_instruction": "請填寫以下表格以讓我們知道你的安全情況",
+  "lang_name": "姓名：",
+  "lang_optional": "選填",
+  "lang_idnumber": "政府頒發的身份證件號碼：",
+  "lang_detail": "詳細情況：",
+  "clear": "清除",
+  "send": "提交",
+  "lang_notinputname": "請輸入姓名",
+  "lang_notinputdetail": "請輸入詳細情況",
+  "lang_sent": "發送成功",
+  "lang_sent_failed": "發送失敗"
+}
